@@ -28,21 +28,24 @@ const dataObj = JSON.parse(data)
 
 // Create a server
 const server = http.createServer((required, response) => {
-  const pathName = required.url
+  const { query, pathname } = url.parse(required.url, true)
 
   // Overview page
-  if (pathName === '/' || pathName === '/overview') {
+  if (pathname === '/' || pathname === '/overview') {
     response.writeHead(200, { 'Content-type': 'text/html' })
     const cardsHTML = dataObj.map((el) => replaceTemplate(templateCard, el)).join('')
     const output = templateOverview.replace('{%PRODUCT_CARDS%}', cardsHTML)
     response.end(output)
 
     // Product page
-  } else if (pathName === '/product') {
-    response.end('This is the PRODUCT')
+  } else if (pathname === '/product') {
+    response.writeHead(200, { 'Content-type': 'text/html' })
+    const product = dataObj[query.id]
+    const output = replaceTemplate(templateProduct, product)
+    response.end(output)
 
     // API
-  } else if (pathName === '/api') {
+  } else if (pathname === '/api') {
     response.writeHead(200, { 'Content-type': 'application/json' })
     response.end(data)
 
